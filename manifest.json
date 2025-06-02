@@ -1,6 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "Enhanced Material You New Tab",
+  "name": "Code Crushers New Tab",
+  "short_name": "Code Crushers",
+  "author": "Code Crushers Team",
+  "homepage_url": "codecrushers.in",
+  "homepage": "https://codecrushers.in",
   "version": "2.0.0",
   "description": "Next-generation Material You inspired new tab with Three.js animations, AI tools, and advanced productivity features",
   "chrome_url_overrides": {
@@ -22,7 +26,7 @@
     "128": "icons/icon128.png"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval' https://cdnjs.cloudflare.com; script-src-elem 'self' 'wasm-unsafe-eval' https://cdnjs.cloudflare.com; object-src 'self'; connect-src 'self' https://api.openweathermap.org https://api.coinbase.com https://api.exchangerate-api.com;"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; script-src-elem 'self' 'wasm-unsafe-eval'; object-src 'self'; connect-src 'self' https://api.openweathermap.org https://api.coinbase.com https://api.exchangerate-api.com;"
   },
   "web_accessible_resources": [
     {

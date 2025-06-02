@@ -38,9 +38,11 @@ class BackgroundService {
     });
 
     // Handle alarms for notifications
-    chrome.alarms.onAlarm.addListener((alarm) => {
-      this.handleAlarm(alarm);
-    });
+    if (chrome.alarms) {
+      chrome.alarms.onAlarm.addListener((alarm) => {
+        this.handleAlarm(alarm);
+      });
+    }
   }
 
   initializeExtension() {
@@ -416,6 +418,11 @@ class BackgroundService {
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
+
+    if (!chrome.alarms) {
+      console.warn("Alarms API not available");
+      return;
+    }
 
     chrome.alarms.create("daily-reset", {
       when: tomorrow.getTime(),
