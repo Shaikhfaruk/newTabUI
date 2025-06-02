@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Material You New Tab",
+  "version": "1.0.0",
+  "description": "Premium Material You inspired new tab with advanced features",
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "permissions": ["storage", "topSites", "bookmarks", "history", "geolocation"],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  }
+}
