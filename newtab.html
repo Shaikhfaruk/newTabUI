@@ -627,10 +627,35 @@
       <div class="modal-content calculator-modal">
         <div class="modal-header">
           <h3>Calculator</h3>
-          <button class="close-modal">×</button>
+          <button class="close-modal" id="closeCalculatorModal">×</button>
         </div>
         <div class="modal-body">
-          <!-- Full calculator interface -->
+          <div class="calculator">
+            <div class="calc-display" id="modalCalcDisplay">0</div>
+            <div class="calc-buttons">
+              <button class="calc-btn operator" data-calc="÷">÷</button>
+              <button class="calc-btn operator" data-calc="×">×</button>
+              <button class="calc-btn operator" data-calc="-">-</button>
+              <button class="calc-btn operator" data-calc="+">+</button>
+              <button class="calc-btn number" data-calc="7">7</button>
+              <button class="calc-btn number" data-calc="8">8</button>
+              <button class="calc-btn number" data-calc="9">9</button>
+              <button class="calc-btn equals" data-calc="=" rowspan="2">
+                =
+              </button>
+              <button class="calc-btn number" data-calc="4">4</button>
+              <button class="calc-btn number" data-calc="5">5</button>
+              <button class="calc-btn number" data-calc="6">6</button>
+              <button class="calc-btn number" data-calc="1">1</button>
+              <button class="calc-btn number" data-calc="2">2</button>
+              <button class="calc-btn number" data-calc="3">3</button>
+              <button class="calc-btn number zero" data-calc="0">0</button>
+              <button class="calc-btn dot" data-calc=".">.</button>
+            </div>
+            <div style="margin-top: 1rem">
+              <button class="calc-clear" id="modalCalcClear">Clear</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
