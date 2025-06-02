@@ -7,43 +7,91 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <!-- 3D Background Elements -->
-    <div class="bg-3d-scene">
-      <div class="floating-cube cube-1"></div>
-      <div class="floating-cube cube-2"></div>
-      <div class="floating-cube cube-3"></div>
-      <div class="floating-sphere sphere-1"></div>
-      <div class="floating-sphere sphere-2"></div>
-      <div class="floating-pyramid pyramid-1"></div>
-      <div class="floating-pyramid pyramid-2"></div>
-      <div class="particle-field">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
+    <!-- Three.js 3D Canvas Background -->
+    <canvas id="three-canvas"></canvas>
+
+    <!-- Floating Action Button -->
+    <div class="floating-action-btn" id="fab">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z" />
+      </svg>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settingsPanel">
+      <div class="settings-header">
+        <h3>Customize</h3>
+        <button class="close-btn" id="closeSettings">×</button>
       </div>
-      <div class="wave-bg"></div>
-      <div class="grid-bg"></div>
+      <div class="settings-content">
+        <div class="setting-group">
+          <label>Background Effect</label>
+          <select id="bgEffect">
+            <option value="particles">Particles</option>
+            <option value="waves">Waves</option>
+            <option value="geometric">Geometric</option>
+            <option value="minimal">Minimal</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>Theme</label>
+          <div class="theme-selector">
+            <button class="theme-btn" data-theme="default">Default</button>
+            <button class="theme-btn" data-theme="neon">Neon</button>
+            <button class="theme-btn" data-theme="sunset">Sunset</button>
+            <button class="theme-btn" data-theme="ocean">Ocean</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="main-layout">
       <!-- Left Main Content Area -->
       <main class="main-content">
-        <!-- Time Display -->
+        <!-- Enhanced Hero Section -->
         <section class="hero-section">
           <div class="time-widget">
             <div class="time-display">
               <span class="hours">00</span>
               <span class="separator">:</span>
               <span class="minutes">00</span>
+              <span class="seconds">00</span>
             </div>
             <div class="date-display">
               <span class="day-name">Monday</span>
               <span class="date-full">January 1, 2024</span>
+            </div>
+            <div class="time-zones">
+              <div class="timezone">
+                <span class="tz-label">NYC</span>
+                <span class="tz-time">--:--</span>
+              </div>
+              <div class="timezone">
+                <span class="tz-label">LON</span>
+                <span class="tz-time">--:--</span>
+              </div>
+              <div class="timezone">
+                <span class="tz-label">TOK</span>
+                <span class="tz-time">--:--</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="stats-overview">
+            <div class="stat-card">
+              <div class="stat-icon">📈</div>
+              <div class="stat-value" id="productivityScore">85%</div>
+              <div class="stat-label">Productivity</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🎯</div>
+              <div class="stat-value" id="goalsCompleted">3/5</div>
+              <div class="stat-label">Goals</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🔥</div>
+              <div class="stat-value" id="streakDays">12</div>
+              <div class="stat-label">Streak</div>
             </div>
           </div>
 
@@ -56,7 +104,7 @@
           </div>
         </section>
 
-        <!-- Search Section -->
+        <!-- Enhanced Search Section -->
         <section class="search-section">
           <div class="search-container">
             <div class="search-box">
@@ -70,13 +118,21 @@
                 placeholder="Search anything..."
                 class="search-input"
               />
-              <div class="search-suggestions"></div>
+              <div class="search-actions">
+                <button class="voice-search" title="Voice Search">🎤</button>
+                <button class="ai-search" title="AI Search">✨</button>
+              </div>
             </div>
+            <div class="search-suggestions"></div>
           </div>
         </section>
 
-        <!-- Quick Access -->
+        <!-- Enhanced Quick Access -->
         <section class="quick-access">
+          <div class="section-header">
+            <h3 class="section-title">Quick Access</h3>
+            <button class="add-link-btn">+ Add</button>
+          </div>
           <div class="quick-links">
             <div class="quick-link" data-url="https://gmail.com">
               <div class="quick-link-icon">📧</div>
@@ -102,77 +158,462 @@
               <div class="quick-link-icon">🎵</div>
               <span class="quick-link-title">Spotify</span>
             </div>
+            <div class="quick-link calculator-link">
+              <div class="quick-link-icon">🧮</div>
+              <span class="quick-link-title">Calculator</span>
+            </div>
+            <div class="quick-link converter-link">
+              <div class="quick-link-icon">🔄</div>
+              <span class="quick-link-title">Converter</span>
+            </div>
           </div>
         </section>
 
         <!-- Recent Bookmarks -->
         <section class="bookmarks-section">
-          <h3 class="section-title">Recent Bookmarks</h3>
+          <div class="section-header">
+            <h3 class="section-title">Recent Bookmarks</h3>
+            <button class="view-all-btn">View All</button>
+          </div>
           <div class="bookmarks-grid"></div>
+        </section>
+
+        <!-- News Feed -->
+        <section class="news-section">
+          <div class="section-header">
+            <h3 class="section-title">Latest News</h3>
+            <button class="refresh-news-btn">🔄</button>
+          </div>
+          <div class="news-grid">
+            <div class="news-item">
+              <div class="news-image">📰</div>
+              <div class="news-content">
+                <h4 class="news-title">Technology News</h4>
+                <p class="news-excerpt">Latest updates in tech industry...</p>
+                <span class="news-time">2h ago</span>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
 
-      <!-- Right Sidebar -->
+      <!-- Enhanced Right Sidebar -->
       <aside class="sidebar">
         <div class="sidebar-content">
-          <!-- Todo List -->
-          <div class="widget todo-widget">
-            <div class="widget-header">
-              <h3 class="widget-title">Tasks</h3>
-              <span class="task-count">0</span>
-            </div>
-            <div class="todo-input">
-              <input
-                type="text"
-                placeholder="Add new task..."
-                class="todo-add-input"
-              />
-              <button class="todo-add-btn">
-                <svg viewBox="0 0 24 24">
-                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-                </svg>
-              </button>
-            </div>
-            <div class="todo-list"></div>
+          <!-- Widget Tabs -->
+          <div class="widget-tabs">
+            <button class="tab-btn active" data-tab="productivity">📋</button>
+            <button class="tab-btn" data-tab="analytics">📊</button>
+            <button class="tab-btn" data-tab="entertainment">🎮</button>
+            <button class="tab-btn" data-tab="tools">🛠️</button>
           </div>
 
-          <!-- Focus Timer -->
-          <div class="widget timer-widget">
-            <div class="widget-header">
-              <h3 class="widget-title">Focus Timer</h3>
-            </div>
-            <div class="timer-display">25:00</div>
-            <div class="timer-controls">
-              <button class="timer-btn start-btn">Start</button>
-              <button class="timer-btn pause-btn">Pause</button>
-              <button class="timer-btn reset-btn">Reset</button>
-            </div>
-          </div>
-
-          <!-- Quick Notes -->
-          <div class="widget notes-widget">
-            <div class="widget-header">
-              <h3 class="widget-title">Quick Notes</h3>
-            </div>
-            <textarea
-              placeholder="Write your thoughts..."
-              class="notes-textarea"
-            ></textarea>
-          </div>
-
-          <!-- Weather Details -->
-          <div class="widget weather-widget">
-            <div class="widget-header">
-              <h3 class="widget-title">Weather</h3>
-            </div>
-            <div class="weather-details-full">
-              <div class="weather-main">
-                <div class="weather-icon-large">🌤️</div>
-                <div class="weather-temp">22°C</div>
+          <!-- Productivity Tab -->
+          <div class="tab-content active" id="productivity-tab">
+            <!-- Enhanced Todo List -->
+            <div class="widget todo-widget">
+              <div class="widget-header">
+                <h3 class="widget-title">Tasks</h3>
+                <div class="widget-actions">
+                  <span class="task-count">0</span>
+                  <button class="sort-btn" title="Sort">↕️</button>
+                </div>
               </div>
-              <div class="weather-info">
-                <div class="weather-location">Your Location</div>
-                <div class="weather-description">Partly Cloudy</div>
+              <div class="todo-input">
+                <input
+                  type="text"
+                  placeholder="Add new task..."
+                  class="todo-add-input"
+                />
+                <select class="priority-select">
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+                <button class="todo-add-btn">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                  </svg>
+                </button>
+              </div>
+              <div class="todo-filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="pending">
+                  Pending
+                </button>
+                <button class="filter-btn" data-filter="completed">Done</button>
+              </div>
+              <div class="todo-list"></div>
+            </div>
+
+            <!-- Enhanced Focus Timer -->
+            <div class="widget timer-widget">
+              <div class="widget-header">
+                <h3 class="widget-title">Focus Timer</h3>
+                <select class="timer-preset">
+                  <option value="25">Pomodoro (25m)</option>
+                  <option value="15">Quick (15m)</option>
+                  <option value="45">Deep Work (45m)</option>
+                  <option value="5">Break (5m)</option>
+                </select>
+              </div>
+              <div class="timer-circle">
+                <svg class="timer-svg" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="45" class="timer-bg"></circle>
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="45"
+                    class="timer-progress"
+                  ></circle>
+                </svg>
+                <div class="timer-display">25:00</div>
+              </div>
+              <div class="timer-controls">
+                <button class="timer-btn start-btn">Start</button>
+                <button class="timer-btn pause-btn">Pause</button>
+                <button class="timer-btn reset-btn">Reset</button>
+              </div>
+              <div class="timer-stats">
+                <div class="stat">
+                  <span class="stat-value">0</span>
+                  <span class="stat-label">Today</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-value">0</span>
+                  <span class="stat-label">Week</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Habit Tracker -->
+            <div class="widget habit-widget">
+              <div class="widget-header">
+                <h3 class="widget-title">Habits</h3>
+                <button class="add-habit-btn">+</button>
+              </div>
+              <div class="habits-list">
+                <div class="habit-item">
+                  <div class="habit-info">
+                    <span class="habit-name">Exercise</span>
+                    <span class="habit-streak">3 days</span>
+                  </div>
+                  <button class="habit-check">✓</button>
+                </div>
+                <div class="habit-item">
+                  <div class="habit-info">
+                    <span class="habit-name">Read</span>
+                    <span class="habit-streak">7 days</span>
+                  </div>
+                  <button class="habit-check">✓</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Notes -->
+            <div class="widget notes-widget">
+              <div class="widget-header">
+                <h3 class="widget-title">Quick Notes</h3>
+                <div class="note-actions">
+                  <button class="save-note-btn">💾</button>
+                  <button class="clear-note-btn">🗑️</button>
+                </div>
+              </div>
+              <textarea
+                placeholder="Write your thoughts..."
+                class="notes-textarea"
+              ></textarea>
+              <div class="note-stats">
+                <span class="word-count">0 words</span>
+                <span class="char-count">0 chars</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analytics Tab -->
+          <div class="tab-content" id="analytics-tab">
+            <!-- Productivity Chart -->
+            <div class="widget chart-widget">
+              <div class="widget-header">
+                <h3 class="widget-title">Productivity</h3>
+                <select class="chart-period">
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                </select>
+              </div>
+              <div class="chart-container">
+                <canvas
+                  id="productivityChart"
+                  width="300"
+                  height="200"
+                ></canvas>
+              </div>
+            </div>
+
+            <!-- Stats Summary -->
+            <div class="widget stats-widget">
+              <div class="widget-header">
+                <h3 class="widget-title">Summary</h3>
+              </div>
+              <div class="stats-grid">
+                <div class="stat-item">
+                  <div class="stat-icon">⏱️</div>
+                  <div class="stat-data">
+                    <span class="stat-number">4.2h</span>
+                    <span class="stat-desc">Focus Time</span>
+                  </div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-icon">✅</div>
+                  <div class="stat-data">
+                    <span class="stat-number">12</span>
+                    <span class="stat-desc">Tasks Done</span>
+                  </div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-icon">🎯</div>
+                  <div class="stat-data">
+                    <span class="stat-number">85%</span>
+                    <span class="stat-desc">Goal Rate</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Weather Details -->
+            <div class="widget weather-widget">
+              <div class="widget-header">
+                <h3 class="widget-title">Weather</h3>
+                <button class="location-btn">📍</button>
+              </div>
+              <div class="weather-details-full">
+                <div class="weather-main">
+                  <div class="weather-icon-large">🌤️</div>
+                  <div class="weather-temp">22°C</div>
+                </div>
+                <div class="weather-info">
+                  <div class="weather-location">Your Location</div>
+                  <div class="weather-description">Partly Cloudy</div>
+                </div>
+                <div class="weather-details-grid">
+                  <div class="weather-detail">
+                    <span class="detail-label">Humidity</span>
+                    <span class="detail-value">65%</span>
+                  </div>
+                  <div class="weather-detail">
+                    <span class="detail-label">Wind</span>
+                    <span class="detail-value">12 km/h</span>
+                  </div>
+                  <div class="weather-detail">
+                    <span class="detail-label">UV Index</span>
+                    <span class="detail-value">3</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Entertainment Tab -->
+          <div class="tab-content" id="entertainment-tab">
+            <!-- Music Player -->
+            <div class="widget music-widget">
+              <div class="widget-header">
+                <h3 class="widget-title">Music</h3>
+                <button class="spotify-connect">🎵</button>
+              </div>
+              <div class="music-player">
+                <div class="music-info">
+                  <div class="album-art">🎵</div>
+                  <div class="track-info">
+                    <div class="track-title">No track playing</div>
+                    <div class="track-artist">Connect your music</div>
+                  </div>
+                </div>
+                <div class="music-controls">
+                  <button class="music-btn">⏮️</button>
+                  <button class="music-btn play-btn">▶️</button>
+                  <button class="music-btn">⏭️</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cryptocurrency -->
+            <div class="widget crypto-widget">
+              <div class="widget-header">
+                <h3 class="widget-title">Crypto</h3>
+                <button class="refresh-crypto">🔄</button>
+              </div>
+              <div class="crypto-list">
+                <div class="crypto-item">
+                  <div class="crypto-info">
+                    <span class="crypto-symbol">BTC</span>
+                    <span class="crypto-name">Bitcoin</span>
+                  </div>
+                  <div class="crypto-price">
+                    <span class="price">$45,230</span>
+                    <span class="change positive">+2.3%</span>
+                  </div>
+                </div>
+                <div class="crypto-item">
+                  <div class="crypto-info">
+                    <span class="crypto-symbol">ETH</span>
+                    <span class="crypto-name">Ethereum</span>
+                  </div>
+                  <div class="crypto-price">
+                    <span class="price">$2,845</span>
+                    <span class="change negative">-1.2%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mini Games -->
+            <div class="widget games-widget">
+              <div class="widget-header">
+                <h3 class="widget-title">Quick Games</h3>
+              </div>
+              <div class="games-grid">
+                <button class="game-btn" data-game="2048">
+                  <span class="game-icon">🔢</span>
+                  <span class="game-name">2048</span>
+                </button>
+                <button class="game-btn" data-game="snake">
+                  <span class="game-icon">🐍</span>
+                  <span class="game-name">Snake</span>
+                </button>
+                <button class="game-btn" data-game="memory">
+                  <span class="game-icon">🧠</span>
+                  <span class="game-name">Memory</span>
+                </button>
+                <button class="game-btn" data-game="typing">
+                  <span class="game-icon">⌨️</span>
+                  <span class="game-name">Typing</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tools Tab -->
+          <div class="tab-content" id="tools-tab">
+            <!-- Calculator -->
+            <div class="widget calculator-widget">
+              <div class="widget-header">
+                <h3 class="widget-title">Calculator</h3>
+                <button class="calc-clear">C</button>
+              </div>
+              <div class="calculator">
+                <div class="calc-display">0</div>
+                <div class="calc-buttons">
+                  <button class="calc-btn operator">÷</button>
+                  <button class="calc-btn operator">×</button>
+                  <button class="calc-btn operator">-</button>
+                  <button class="calc-btn operator">+</button>
+                  <button class="calc-btn number">7</button>
+                  <button class="calc-btn number">8</button>
+                  <button class="calc-btn number">9</button>
+                  <button class="calc-btn equals">=</button>
+                  <button class="calc-btn number">4</button>
+                  <button class="calc-btn number">5</button>
+                  <button class="calc-btn number">6</button>
+                  <button class="calc-btn number">1</button>
+                  <button class="calc-btn number">2</button>
+                  <button class="calc-btn number">3</button>
+                  <button class="calc-btn number zero">0</button>
+                  <button class="calc-btn dot">.</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Unit Converter -->
+            <div class="widget converter-widget">
+              <div class="widget-header">
+                <h3 class="widget-title">Converter</h3>
+                <select class="converter-type">
+                  <option value="length">Length</option>
+                  <option value="weight">Weight</option>
+                  <option value="temperature">Temperature</option>
+                  <option value="currency">Currency</option>
+                </select>
+              </div>
+              <div class="converter">
+                <div class="convert-row">
+                  <input
+                    type="number"
+                    class="convert-input"
+                    id="fromValue"
+                    placeholder="0"
+                  />
+                  <select class="convert-unit" id="fromUnit">
+                    <option value="m">Meters</option>
+                    <option value="km">Kilometers</option>
+                    <option value="ft">Feet</option>
+                    <option value="in">Inches</option>
+                  </select>
+                </div>
+                <div class="convert-swap">
+                  <button class="swap-btn">⇅</button>
+                </div>
+                <div class="convert-row">
+                  <input
+                    type="number"
+                    class="convert-input"
+                    id="toValue"
+                    placeholder="0"
+                    readonly
+                  />
+                  <select class="convert-unit" id="toUnit">
+                    <option value="m">Meters</option>
+                    <option value="km">Kilometers</option>
+                    <option value="ft">Feet</option>
+                    <option value="in">Inches</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Color Picker -->
+            <div class="widget color-widget">
+              <div class="widget-header">
+                <h3 class="widget-title">Color Picker</h3>
+                <button class="copy-color">📋</button>
+              </div>
+              <div class="color-picker">
+                <input type="color" id="colorInput" value="#6366f1" />
+                <div class="color-info">
+                  <div class="color-value">
+                    <label>HEX</label>
+                    <input type="text" id="hexValue" value="#6366f1" readonly />
+                  </div>
+                  <div class="color-value">
+                    <label>RGB</label>
+                    <input
+                      type="text"
+                      id="rgbValue"
+                      value="rgb(99, 102, 241)"
+                      readonly
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- QR Code Generator -->
+            <div class="widget qr-widget">
+              <div class="widget-header">
+                <h3 class="widget-title">QR Generator</h3>
+                <button class="download-qr">💾</button>
+              </div>
+              <div class="qr-generator">
+                <input
+                  type="text"
+                  class="qr-input"
+                  placeholder="Enter text or URL"
+                />
+                <div class="qr-code" id="qrCode">
+                  <div class="qr-placeholder">
+                    Enter text to generate QR code
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -180,6 +621,20 @@
       </aside>
     </div>
 
+    <!-- Modal Overlays -->
+    <div class="modal-overlay" id="calculatorModal">
+      <div class="modal-content calculator-modal">
+        <div class="modal-header">
+          <h3>Calculator</h3>
+          <button class="close-modal">×</button>
+        </div>
+        <div class="modal-body">
+          <!-- Full calculator interface -->
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

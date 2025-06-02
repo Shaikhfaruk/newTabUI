@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Enhanced New Tab Settings</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        width: 360px;
+        min-height: 500px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: linear-gradient(
+          135deg,
+          #0f0f23 0%,
+          #1a1a2e 50%,
+          #16213e 100%
+        );
+        color: #ffffff;
+        overflow-x: hidden;
+      }
+
+      .popup-header {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+      }
+
+      .popup-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #818cf8, #06b6d4);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+      }
+
+      .popup-subtitle {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .popup-content {
+        padding: 1rem;
+      }
+
+      .section {
+        margin-bottom: 1.5rem;
+      }
+
+      .section-title {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .section-icon {
+        font-size: 1rem;
+      }
+
+      .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .action-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .action-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: #6366f1;
+        transform: translateY(-2px);
+      }
+
+      .action-icon {
+        font-size: 1.5rem;
+      }
+
+      .action-label {
+        font-size: 0.75rem;
+        text-align: center;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+      }
+
+      .stat-item {
+        text-align: center;
+        padding: 0.75rem 0.5rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .stat-value {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #6366f1;
+        margin-bottom: 0.25rem;
+      }
+
+      .stat-label {
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .setting-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .setting-item:last-child {
+        border-bottom: none;
+      }
+
+      .setting-label {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .toggle-switch {
+        position: relative;
+        width: 40px;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+
+      .toggle-switch.active {
+        background: #6366f1;
+      }
+
+      .toggle-switch::before {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 16px;
+        height: 16px;
+        background: white;
+        border-radius: 50%;
+        transition: transform 0.3s ease;
+      }
+
+      .toggle-switch.active::before {
+        transform: translateX(20px);
+      }
+
+      .select-input {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 0.5rem;
+        color: white;
+        font-size: 0.8rem;
+        min-width: 100px;
+      }
+
+      .select-input option {
+        background: #1a1a2e;
+        color: white;
+      }
+
+      .productivity-ring {
+        position: relative;
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 1rem;
+      }
+
+      .ring-svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+      }
+
+      .ring-bg {
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.1);
+        stroke-width: 4;
+      }
+
+      .ring-progress {
+        fill: none;
+        stroke: #6366f1;
+        stroke-width: 4;
+        stroke-linecap: round;
+        stroke-dasharray: 157;
+        stroke-dashoffset: 157;
+        transition: stroke-dashoffset 0.5s ease;
+      }
+
+      .ring-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #6366f1;
+      }
+
+      .footer {
+        padding: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+      }
+
+      .footer-links {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .footer-link {
+        color: rgba(255, 255, 255, 0.6);
+        text-decoration: none;
+        font-size: 0.75rem;
+        transition: color 0.3s ease;
+      }
+
+      .footer-link:hover {
+        color: #6366f1;
+      }
+
+      .version {
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.4);
+      }
+
+      .weather-compact {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        margin-bottom: 1rem;
+      }
+
+      .weather-icon {
+        font-size: 2rem;
+      }
+
+      .weather-info {
+        flex: 1;
+      }
+
+      .weather-temp {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: white;
+      }
+
+      .weather-desc {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .habit-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .habit-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 8px;
+      }
+
+      .habit-name {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .habit-check {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+        font-size: 0.7rem;
+      }
+
+      .habit-check.completed {
+        background: #10b981;
+      }
+
+      .notification {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        left: 1rem;
+        background: rgba(16, 185, 129, 0.9);
+        color: white;
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        transform: translateY(-100px);
+        opacity: 0;
+        transition: all 0.3s ease;
+        z-index: 1000;
+      }
+
+      .notification.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      .notification.error {
+        background: rgba(239, 68, 68, 0.9);
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      .loading {
+        animation: pulse 1.5s infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="popup-header">
+      <h1 class="popup-title">Enhanced New Tab</h1>
+      <p class="popup-subtitle">Productivity & Customization</p>
+    </div>
+
+    <div class="popup-content">
+      <!-- Quick Actions -->
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">⚡</span>
+          Quick Actions
+        </h2>
+        <div class="quick-actions">
+          <div class="action-btn" id="openCalculator">
+            <span class="action-icon">🧮</span>
+            <span class="action-label">Calculator</span>
+          </div>
+          <div class="action-btn" id="openConverter">
+            <span class="action-icon">🔄</span>
+            <span class="action-label">Converter</span>
+          </div>
+          <div class="action-btn" id="openPomodoro">
+            <span class="action-icon">⏱️</span>
+            <span class="action-label">Timer</span>
+          </div>
+          <div class="action-btn" id="openNotes">
+            <span class="action-icon">📝</span>
+            <span class="action-label">Notes</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Productivity Overview -->
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">📊</span>
+          Today's Progress
+        </h2>
+        <div class="productivity-ring">
+          <svg class="ring-svg" viewBox="0 0 50 50">
+            <circle cx="25" cy="25" r="20" class="ring-bg"></circle>
+            <circle
+              cx="25"
+              cy="25"
+              r="20"
+              class="ring-progress"
+              id="productivityRing"
+            ></circle>
+          </svg>
+          <div class="ring-text" id="productivityText">85%</div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-value" id="tasksCompleted">12</div>
+            <div class="stat-label">Tasks</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="pomodoroSessions">4</div>
+            <div class="stat-label">Focus</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="streakDays">7</div>
+            <div class="stat-label">Streak</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weather -->
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">🌤️</span>
+          Weather
+        </h2>
+        <div class="weather-compact" id="weatherWidget">
+          <div class="weather-icon">🌤️</div>
+          <div class="weather-info">
+            <div class="weather-temp">22°C</div>
+            <div class="weather-desc">Partly Cloudy</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Habits -->
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">✅</span>
+          Quick Habits
+        </h2>
+        <div class="habit-list" id="habitList">
+          <div class="habit-item">
+            <span class="habit-name">Exercise</span>
+            <button class="habit-check" data-habit="exercise">✓</button>
+          </div>
+          <div class="habit-item">
+            <span class="habit-name">Read</span>
+            <button class="habit-check" data-habit="read">✓</button>
+          </div>
+          <div class="habit-item">
+            <span class="habit-name">Meditate</span>
+            <button class="habit-check" data-habit="meditate">✓</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-icon">⚙️</span>
+          Quick Settings
+        </h2>
+        <div class="setting-item">
+          <span class="setting-label">Background Effects</span>
+          <div class="toggle-switch active" id="backgroundToggle"></div>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">Weather Widget</span>
+          <div class="toggle-switch active" id="weatherToggle"></div>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">Notifications</span>
+          <div class="toggle-switch active" id="notificationToggle"></div>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">Theme</span>
+          <select class="select-input" id="themeSelect">
+            <option value="default">Default</option>
+            <option value="neon">Neon</option>
+            <option value="sunset">Sunset</option>
+            <option value="ocean">Ocean</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-links">
+        <a href="#" class="footer-link" id="openNewTab">Open New Tab</a>
+        <a href="#" class="footer-link" id="resetData">Reset Data</a>
+        <a href="#" class="footer-link" id="exportData">Export</a>
+      </div>
+      <div class="version">v2.0.0</div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+      class PopupController {
+        constructor() {
+          this.init();
+        }
+
+        init() {
+          this.loadData();
+          this.setupEventListeners();
+          this.updateProductivityRing();
+        }
+
+        setupEventListeners() {
+          // Quick actions
+          document
+            .getElementById("openCalculator")
+            .addEventListener("click", () => {
+              this.sendCommand("openCalculator");
+            });
+
+          document
+            .getElementById("openConverter")
+            .addEventListener("click", () => {
+              this.sendCommand("openConverter");
+            });
+
+          document
+            .getElementById("openPomodoro")
+            .addEventListener("click", () => {
+              this.sendCommand("openPomodoro");
+            });
+
+          document.getElementById("openNotes").addEventListener("click", () => {
+            this.sendCommand("openNotes");
+          });
+
+          // Settings toggles
+          document
+            .getElementById("backgroundToggle")
+            .addEventListener("click", (e) => {
+              this.toggleSetting(e.target, "backgroundEffects");
+            });
+
+          document
+            .getElementById("weatherToggle")
+            .addEventListener("click", (e) => {
+              this.toggleSetting(e.target, "showWeather");
+            });
+
+          document
+            .getElementById("notificationToggle")
+            .addEventListener("click", (e) => {
+              this.toggleSetting(e.target, "notifications");
+            });
+
+          document
+            .getElementById("themeSelect")
+            .addEventListener("change", (e) => {
+              this.updateTheme(e.target.value);
+            });
+
+          // Habit checkboxes
+          document.querySelectorAll(".habit-check").forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+              this.toggleHabit(e.target);
+            });
+          });
+
+          // Footer links
+          document
+            .getElementById("openNewTab")
+            .addEventListener("click", () => {
+              chrome.tabs.create({ url: "chrome://newtab/" });
+              window.close();
+            });
+
+          document.getElementById("resetData").addEventListener("click", () => {
+            this.resetData();
+          });
+
+          document
+            .getElementById("exportData")
+            .addEventListener("click", () => {
+              this.exportData();
+            });
+        }
+
+        async loadData() {
+          try {
+            // Load productivity stats
+            const response = await chrome.runtime.sendMessage({
+              action: "getProductivityData",
+            });
+            if (response.success) {
+              this.updateStats(response.data);
+            }
+
+            // Load weather
+            this.loadWeather();
+
+            // Load settings
+            const settings = await chrome.storage.sync.get(["settings"]);
+            if (settings.settings) {
+              this.updateSettingsUI(settings.settings);
+            }
+
+            // Load habits
+            this.loadHabits();
+          } catch (error) {
+            console.error("Error loading data:", error);
+          }
+        }
+
+        updateStats(productivityData) {
+          const today = new Date().toDateString();
+          const todayData = productivityData[today] || {
+            tasksCompleted: 0,
+            pomodoroSessions: 0,
+            focusTime: 0,
+          };
+
+          document.getElementById("tasksCompleted").textContent =
+            todayData.tasksCompleted;
+          document.getElementById("pomodoroSessions").textContent =
+            todayData.pomodoroSessions;
+
+          // Calculate productivity score
+          const score = this.calculateProductivityScore(todayData);
+          document.getElementById("productivityText").textContent = `${score}%`;
+          this.updateProductivityRing(score);
+        }
+
+        calculateProductivityScore(data) {
+          let score = 0;
+          score += Math.min(data.tasksCompleted * 10, 50);
+          score += Math.min(data.pomodoroSessions * 15, 30);
+          score += Math.min(data.focusTime / 60, 20); // Focus time in hours
+          return Math.min(Math.round(score), 100);
+        }
+
+        updateProductivityRing(score = 85) {
+          const ring = document.getElementById("productivityRing");
+          const circumference = 2 * Math.PI * 20; // radius = 20
+          const offset = circumference - (score / 100) * circumference;
+          ring.style.strokeDashoffset = offset;
+        }
+
+        async loadWeather() {
+          try {
+            const response = await chrome.runtime.sendMessage({
+              action: "getWeatherData",
+            });
+            if (response.success) {
+              this.updateWeatherWidget(response.data);
+            }
+          } catch (error) {
+            console.error("Error loading weather:", error);
+          }
+        }
+
+        updateWeatherWidget(weatherData) {
+          const widget = document.getElementById("weatherWidget");
+          const icon = this.getWeatherIcon(weatherData.icon);
+
+          widget.innerHTML = `
+                    <div class="weather-icon">${icon}</div>
+                    <div class="weather-info">
+                        <div class="weather-temp">${weatherData.temperature}°C</div>
+                        <div class="weather-desc">${weatherData.description}</div>
+                    </div>
+                `;
+        }
+
+        getWeatherIcon(iconCode) {
+          const iconMap = {
+            "01d": "☀️",
+            "01n": "🌙",
+            "02d": "🌤️",
+            "02n": "🌤️",
+            "03d": "☁️",
+            "03n": "☁️",
+            "04d": "🌥️",
+            "04n": "🌥️",
+            "09d": "🌧️",
+            "09n": "🌧️",
+            "10d": "🌦️",
+            "10n": "🌦️",
+            "11d": "⛈️",
+            "11n": "⛈️",
+            "13d": "❄️",
+            "13n": "❄️",
+            "50d": "🌫️",
+            "50n": "🌫️",
+          };
+          return iconMap[iconCode] || "🌍";
+        }
+
+        async loadHabits() {
+          const stored = await chrome.storage.local.get(["habits"]);
+          const habits = stored.habits || {};
+          const today = new Date().toDateString();
+          const todayHabits = habits[today] || {};
+
+          document.querySelectorAll(".habit-check").forEach((btn) => {
+            const habitName = btn.dataset.habit;
+            if (todayHabits[habitName]) {
+              btn.classList.add("completed");
+            }
+          });
+        }
+
+        async sendCommand(command) {
+          try {
+            await chrome.runtime.sendMessage({ action: command });
+            this.showNotification(`${command} opened!`, "success");
+            window.close();
+          } catch (error) {
+            this.showNotification("Error opening tool", "error");
+          }
+        }
+
+        async toggleSetting(toggle, settingName) {
+          toggle.classList.toggle("active");
+          const isActive = toggle.classList.contains("active");
+
+          const settings = await chrome.storage.sync.get(["settings"]);
+          const updatedSettings = {
+            ...settings.settings,
+            [settingName]: isActive,
+          };
+
+          await chrome.storage.sync.set({ settings: updatedSettings });
+          await chrome.runtime.sendMessage({
+            action: "updateSettings",
+            settings: updatedSettings,
+          });
+
+          this.showNotification(
+            `${settingName} ${isActive ? "enabled" : "disabled"}`,
+            "success"
+          );
+        }
+
+        async updateTheme(theme) {
+          const settings = await chrome.storage.sync.get(["settings"]);
+          const updatedSettings = { ...settings.settings, theme };
+
+          await chrome.storage.sync.set({ settings: updatedSettings });
+          await chrome.runtime.sendMessage({
+            action: "updateSettings",
+            settings: updatedSettings,
+          });
+
+          this.showNotification(`Theme changed to ${theme}`, "success");
+        }
+
+        updateSettingsUI(settings) {
+          document
+            .getElementById("backgroundToggle")
+            .classList.toggle("active", settings.backgroundEffects !== false);
+          document
+            .getElementById("weatherToggle")
+            .classList.toggle("active", settings.showWeather !== false);
+          document
+            .getElementById("notificationToggle")
+            .classList.toggle("active", settings.notifications !== false);
+          document.getElementById("themeSelect").value =
+            settings.theme || "default";
+        }
+
+        async toggleHabit(button) {
+          const habitName = button.dataset.habit;
+          const isCompleted = button.classList.contains("completed");
+
+          button.classList.toggle("completed");
+
+          // Save habit state
+          const stored = await chrome.storage.local.get(["habits"]);
+          const habits = stored.habits || {};
+          const today = new Date().toDateString();
+
+          if (!habits[today]) {
+            habits[today] = {};
+          }
+
+          habits[today][habitName] = !isCompleted;
+          await chrome.storage.local.set({ habits });
+
+          // Update productivity data
+          await chrome.runtime.sendMessage({
+            action: "saveProductivityData",
+            data: {
+              habitsCompleted: Object.values(habits[today]).filter(Boolean)
+                .length,
+            },
+          });
+
+          this.showNotification(
+            `Habit ${!isCompleted ? "completed" : "unchecked"}!`,
+            "success"
+          );
+
+          // Reload stats
+          setTimeout(() => this.loadData(), 500);
+        }
+
+        async resetData() {
+          if (
+            confirm(
+              "Are you sure you want to reset all data? This cannot be undone."
+            )
+          ) {
+            await chrome.storage.local.clear();
+            await chrome.storage.sync.clear();
+            this.showNotification("Data reset successfully", "success");
+            setTimeout(() => this.loadData(), 1000);
+          }
+        }
+
+        async exportData() {
+          try {
+            const productivityData = await chrome.storage.local.get();
+            const settings = await chrome.storage.sync.get();
+
+            const exportData = {
+              productivity: productivityData,
+              settings: settings,
+              exportDate: new Date().toISOString(),
+            };
+
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+              type: "application/json",
+            });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `enhanced-newtab-data-${
+              new Date().toISOString().split("T")[0]
+            }.json`;
+            a.click();
+
+            URL.revokeObjectURL(url);
+            this.showNotification("Data exported successfully", "success");
+          } catch (error) {
+            this.showNotification("Export failed", "error");
+          }
+        }
+
+        showNotification(message, type = "success") {
+          const notification = document.getElementById("notification");
+          notification.textContent = message;
+          notification.className = `notification ${type}`;
+          notification.classList.add("show");
+
+          setTimeout(() => {
+            notification.classList.remove("show");
+          }, 3000);
+        }
+      }
+
+      // Initialize popup when DOM is loaded
+      document.addEventListener("DOMContentLoaded", () => {
+        new PopupController();
+      });
+    </script>
+  </body>
+</html>
