@@ -6,6 +6,7 @@ class MaterialNewTab {
     this.loadBookmarks();
     this.initializeProductivity();
     this.setupSearch();
+    this.animate3DElements();
   }
 
   init() {
@@ -16,7 +17,7 @@ class MaterialNewTab {
 
   animateElements() {
     const elements = document.querySelectorAll(
-      ".header, .search-section, .quick-access, .bookmarks-section, .productivity-section"
+      ".hero-section, .search-section, .quick-access, .bookmarks-section, .sidebar"
     );
     elements.forEach((el, index) => {
       el.style.opacity = "0";
@@ -26,6 +27,25 @@ class MaterialNewTab {
         el.style.opacity = "1";
         el.style.transform = "translateY(0)";
       }, index * 150);
+    });
+  }
+
+  animate3DElements() {
+    // Add random animation delays to 3D elements for more dynamic feel
+    const cubes = document.querySelectorAll(".floating-cube");
+    const spheres = document.querySelectorAll(".floating-sphere");
+    const pyramids = document.querySelectorAll(".floating-pyramid");
+
+    cubes.forEach((cube, index) => {
+      cube.style.animationDelay = `${-index * 3}s`;
+    });
+
+    spheres.forEach((sphere, index) => {
+      sphere.style.animationDelay = `${-index * 5}s`;
+    });
+
+    pyramids.forEach((pyramid, index) => {
+      pyramid.style.animationDelay = `${-index * 7}s`;
     });
   }
 
@@ -40,36 +60,36 @@ class MaterialNewTab {
       });
     });
 
-    // Settings button
-    document.querySelector(".settings-btn").addEventListener("click", () => {
-      this.openSettings();
-    });
-
     // Search functionality
     const searchInput = document.querySelector(".search-input");
-    searchInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        this.performSearch(e.target.value);
-      }
-    });
+    if (searchInput) {
+      searchInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          this.performSearch(e.target.value);
+        }
+      });
 
-    searchInput.addEventListener("input", (e) => {
-      this.showSearchSuggestions(e.target.value);
-    });
+      searchInput.addEventListener("input", (e) => {
+        this.showSearchSuggestions(e.target.value);
+      });
+    }
   }
 
   startClock() {
     const updateClock = () => {
       const now = new Date();
 
-      // Update time
+      // Update time (without seconds)
       const hours = now.getHours().toString().padStart(2, "0");
       const minutes = now.getMinutes().toString().padStart(2, "0");
-      const seconds = now.getSeconds().toString().padStart(2, "0");
 
-      document.querySelector(".hours").textContent = hours;
-      document.querySelector(".minutes").textContent = minutes;
-      document.querySelector(".seconds").textContent = seconds;
+      const hoursEl = document.querySelector(".hours");
+      const minutesEl = document.querySelector(".minutes");
+
+      if (hoursEl && minutesEl) {
+        hoursEl.textContent = hours;
+        minutesEl.textContent = minutes;
+      }
 
       // Update date
       const dayNames = [
@@ -101,10 +121,13 @@ class MaterialNewTab {
       const day = now.getDate();
       const year = now.getFullYear();
 
-      document.querySelector(".day-name").textContent = dayName;
-      document.querySelector(
-        ".date-full"
-      ).textContent = `${month} ${day}, ${year}`;
+      const dayNameEl = document.querySelector(".day-name");
+      const dateFullEl = document.querySelector(".date-full");
+
+      if (dayNameEl && dateFullEl) {
+        dayNameEl.textContent = dayName;
+        dateFullEl.textContent = `${month} ${day}, ${year}`;
+      }
     };
 
     updateClock();
@@ -114,18 +137,20 @@ class MaterialNewTab {
   async loadBookmarks() {
     try {
       const bookmarks = await new Promise((resolve) => {
-        chrome.bookmarks.getRecent(8, resolve);
+        chrome.bookmarks.getRecent(6, resolve);
       });
 
       const bookmarksGrid = document.querySelector(".bookmarks-grid");
-      bookmarksGrid.innerHTML = "";
+      if (bookmarksGrid) {
+        bookmarksGrid.innerHTML = "";
 
-      bookmarks.forEach((bookmark) => {
-        if (bookmark.url) {
-          const bookmarkEl = this.createBookmarkElement(bookmark);
-          bookmarksGrid.appendChild(bookmarkEl);
-        }
-      });
+        bookmarks.forEach((bookmark) => {
+          if (bookmark.url) {
+            const bookmarkEl = this.createBookmarkElement(bookmark);
+            bookmarksGrid.appendChild(bookmarkEl);
+          }
+        });
+      }
     } catch (error) {
       console.log("Bookmarks permission not available");
     }
@@ -135,19 +160,17 @@ class MaterialNewTab {
     const div = document.createElement("div");
     div.className = "bookmark-item";
     div.innerHTML = `
-            <div class="bookmark-favicon">
-                <img src="https://www.google.com/s2/favicons?domain=${
-                  new URL(bookmark.url).hostname
-                }" 
-                     alt="favicon" onerror="this.style.display='none'">
-            </div>
-            <div class="bookmark-info">
-                <div class="bookmark-title">${bookmark.title}</div>
-                <div class="bookmark-url">${
-                  new URL(bookmark.url).hostname
-                }</div>
-            </div>
-        `;
+      <div class="bookmark-favicon">
+        <img src="https://www.google.com/s2/favicons?domain=${
+          new URL(bookmark.url).hostname
+        }" 
+             alt="favicon" onerror="this.style.display='none'">
+      </div>
+      <div class="bookmark-info">
+        <div class="bookmark-title">${bookmark.title}</div>
+        <div class="bookmark-url">${new URL(bookmark.url).hostname}</div>
+      </div>
+    `;
 
     div.addEventListener("click", () => {
       window.open(bookmark.url, "_blank");
@@ -167,6 +190,8 @@ class MaterialNewTab {
     const todoBtn = document.querySelector(".todo-add-btn");
     const todoList = document.querySelector(".todo-list");
 
+    if (!todoInput || !todoBtn || !todoList) return;
+
     const addTodo = () => {
       const text = todoInput.value.trim();
       if (text) {
@@ -174,6 +199,7 @@ class MaterialNewTab {
         todoList.appendChild(todoItem);
         todoInput.value = "";
         this.saveTodos();
+        this.updateTaskCount();
       }
     };
 
@@ -191,14 +217,12 @@ class MaterialNewTab {
     const div = document.createElement("div");
     div.className = "todo-item slide-in";
     div.innerHTML = `
-            <input type="checkbox" class="todo-checkbox" ${
-              completed ? "checked" : ""
-            }>
-            <span class="todo-text ${
-              completed ? "completed" : ""
-            }">${text}</span>
-            <button class="todo-delete">×</button>
-        `;
+      <input type="checkbox" class="todo-checkbox" ${
+        completed ? "checked" : ""
+      }>
+      <span class="todo-text ${completed ? "completed" : ""}">${text}</span>
+      <button class="todo-delete">×</button>
+    `;
 
     const checkbox = div.querySelector(".todo-checkbox");
     const todoText = div.querySelector(".todo-text");
@@ -207,14 +231,27 @@ class MaterialNewTab {
     checkbox.addEventListener("change", () => {
       todoText.classList.toggle("completed", checkbox.checked);
       this.saveTodos();
+      this.updateTaskCount();
     });
 
     deleteBtn.addEventListener("click", () => {
       div.remove();
       this.saveTodos();
+      this.updateTaskCount();
     });
 
     return div;
+  }
+
+  updateTaskCount() {
+    const taskCountEl = document.querySelector(".task-count");
+    const incompleteTasks = document.querySelectorAll(
+      ".todo-item .todo-checkbox:not(:checked)"
+    ).length;
+
+    if (taskCountEl) {
+      taskCountEl.textContent = incompleteTasks.toString();
+    }
   }
 
   saveTodos() {
@@ -233,26 +270,31 @@ class MaterialNewTab {
     );
     const todoList = document.querySelector(".todo-list");
 
-    todos.forEach((todo) => {
-      const todoItem = this.createTodoItem(todo.text, todo.completed);
-      todoList.appendChild(todoItem);
-    });
+    if (todoList) {
+      todos.forEach((todo) => {
+        const todoItem = this.createTodoItem(todo.text, todo.completed);
+        todoList.appendChild(todoItem);
+      });
+      this.updateTaskCount();
+    }
   }
 
   initNotes() {
     const notesTextarea = document.querySelector(".notes-textarea");
 
-    // Load saved notes
-    notesTextarea.value = localStorage.getItem("material-newtab-notes") || "";
+    if (notesTextarea) {
+      // Load saved notes
+      notesTextarea.value = localStorage.getItem("material-newtab-notes") || "";
 
-    // Auto-save notes
-    let saveTimeout;
-    notesTextarea.addEventListener("input", () => {
-      clearTimeout(saveTimeout);
-      saveTimeout = setTimeout(() => {
-        localStorage.setItem("material-newtab-notes", notesTextarea.value);
-      }, 500);
-    });
+      // Auto-save notes
+      let saveTimeout;
+      notesTextarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(() => {
+          localStorage.setItem("material-newtab-notes", notesTextarea.value);
+        }, 500);
+      });
+    }
   }
 
   initTimer() {
@@ -264,6 +306,8 @@ class MaterialNewTab {
     const startBtn = document.querySelector(".start-btn");
     const pauseBtn = document.querySelector(".pause-btn");
     const resetBtn = document.querySelector(".reset-btn");
+
+    if (!timerDisplay || !startBtn || !pauseBtn || !resetBtn) return;
 
     const updateDisplay = () => {
       const minutes = Math.floor(timeLeft / 60);
@@ -277,6 +321,7 @@ class MaterialNewTab {
       if (!isRunning) {
         isRunning = true;
         startBtn.textContent = "Running...";
+        startBtn.disabled = true;
         timerInterval = setInterval(() => {
           timeLeft--;
           updateDisplay();
@@ -285,7 +330,8 @@ class MaterialNewTab {
             clearInterval(timerInterval);
             isRunning = false;
             startBtn.textContent = "Start";
-            this.showNotification("Pomodoro Complete!", "Time for a break!");
+            startBtn.disabled = false;
+            this.showNotification("Focus Complete!", "Time for a break!");
             timeLeft = 25 * 60;
             updateDisplay();
           }
@@ -298,6 +344,7 @@ class MaterialNewTab {
         clearInterval(timerInterval);
         isRunning = false;
         startBtn.textContent = "Start";
+        startBtn.disabled = false;
       }
     };
 
@@ -306,6 +353,7 @@ class MaterialNewTab {
       isRunning = false;
       timeLeft = 25 * 60;
       startBtn.textContent = "Start";
+      startBtn.disabled = false;
       updateDisplay();
     };
 
@@ -319,6 +367,8 @@ class MaterialNewTab {
   setupSearch() {
     const searchInput = document.querySelector(".search-input");
     const suggestionsContainer = document.querySelector(".search-suggestions");
+
+    if (!searchInput || !suggestionsContainer) return;
 
     let searchTimeout;
     searchInput.addEventListener("input", (e) => {
@@ -353,6 +403,8 @@ class MaterialNewTab {
     ];
 
     const suggestionsContainer = document.querySelector(".search-suggestions");
+    if (!suggestionsContainer) return;
+
     suggestionsContainer.innerHTML = "";
 
     suggestions.forEach((suggestion) => {
@@ -360,9 +412,12 @@ class MaterialNewTab {
       div.className = "search-suggestion";
       div.textContent = suggestion;
       div.addEventListener("click", () => {
-        document.querySelector(".search-input").value = suggestion;
-        this.performSearch(suggestion);
-        suggestionsContainer.style.display = "none";
+        const searchInput = document.querySelector(".search-input");
+        if (searchInput) {
+          searchInput.value = suggestion;
+          this.performSearch(suggestion);
+          suggestionsContainer.style.display = "none";
+        }
       });
       suggestionsContainer.appendChild(div);
     });
@@ -379,32 +434,162 @@ class MaterialNewTab {
     }
   }
 
-  async getWeatherData() {
+  async getWeatherData(defaultCity = "Pune") {
+    const apiKey = "42e074096c5c7a24d95f9929fe994d3b"; // <-- REPLACE WITH YOUR ACTUAL API KEY
+    let weatherApiUrl;
+
+    if (!apiKey || apiKey === "YOUR_OPENWEATHERMAP_API_KEY") {
+      console.error(
+        "OpenWeatherMap API key is missing or is the placeholder. Please add your API key to script.js."
+      );
+      this.updateWeatherDisplay({
+        temperature: "--",
+        location: "API Key Missing",
+        icon: "⚠️",
+        description: "Setup required in script.js",
+      });
+      return;
+    }
+
     try {
       const position = await new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject);
+        if (!navigator.geolocation) {
+          reject(new Error("Geolocation is not supported by your browser."));
+          return;
+        }
+        // Timeout for geolocation to prevent indefinite waiting
+        const timeoutId = setTimeout(
+          () => reject(new Error("Geolocation timed out")),
+          7000
+        );
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            clearTimeout(timeoutId);
+            resolve(pos);
+          },
+          (err) => {
+            clearTimeout(timeoutId);
+            reject(err);
+          }
+        );
       });
 
       const { latitude, longitude } = position.coords;
+      weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
+      console.log("Fetching weather by coordinates...");
+    } catch (geoError) {
+      console.warn(
+        `Geolocation failed: ${geoError.message}. Falling back to city: ${defaultCity}`
+      );
+      weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${defaultCity}&appid=${apiKey}&units=metric`;
+    }
 
-      // You would typically use a weather API here
-      // For demo purposes, we'll use placeholder data
+    try {
+      const response = await fetch(weatherApiUrl);
+      if (!response.ok) {
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: response.statusText }));
+        throw new Error(
+          `Weather API request failed: ${response.status} - ${
+            errorData.message || "Unknown error"
+          }`
+        );
+      }
+      const data = await response.json();
+
+      if (!data.main || !data.weather || !data.weather.length) {
+        throw new Error("Incomplete weather data received from API.");
+      }
+
       this.updateWeatherDisplay({
-        temperature: Math.round(Math.random() * 30 + 10),
-        location: "Your Location",
-        icon: "🌤️",
+        temperature: Math.round(data.main.temp),
+        location: data.name,
+        icon: this.getWeatherIcon(data.weather[0].main, data.weather[0].icon),
+        description: data.weather[0].description.replace(/\b\w/g, (l) =>
+          l.toUpperCase()
+        ), // Capitalize first letter of each word
       });
     } catch (error) {
-      console.log("Location access denied or unavailable");
+      console.error("Error fetching or processing weather data:", error);
+      this.updateWeatherDisplay({
+        temperature: "--",
+        location: defaultCity, // Show the city we attempted to fetch for
+        icon: "⚠️",
+        description: "Weather data unavailable",
+      });
     }
   }
 
+  getWeatherIcon(weatherMain, iconCode) {
+    const main = weatherMain.toLowerCase();
+    // You can expand this mapping or use OpenWeatherMap's icon URLs if preferred
+    // e.g., `http://openweathermap.org/img/wn/${iconCode}@2x.png`
+    // For simplicity, using emojis based on main condition:
+    if (main.includes("clear")) return "☀️";
+    if (main.includes("clouds")) {
+      if (iconCode === "02d" || iconCode === "02n") return "🌤️"; // Few clouds
+      if (iconCode === "03d" || iconCode === "03n") return "☁️"; // Scattered clouds
+      if (iconCode === "04d" || iconCode === "04n") return "🌥️"; // Broken clouds / Overcast
+      return "☁️"; // Default for clouds
+    }
+    if (main.includes("rain")) return "🌧️";
+    if (main.includes("drizzle")) return "🌦️";
+    if (main.includes("thunderstorm")) return "⛈️";
+    if (main.includes("snow")) return "❄️";
+    if (
+      main.includes("mist") ||
+      main.includes("fog") ||
+      main.includes("haze") ||
+      main.includes("smoke") ||
+      main.includes("dust") ||
+      main.includes("sand") ||
+      main.includes("ash") ||
+      main.includes("squall") ||
+      main.includes("tornado")
+    )
+      return "🌫️";
+
+    // Fallback based on OpenWeatherMap icon codes if main condition didn't match well
+    if (iconCode.startsWith("01")) return "☀️"; // clear
+    if (iconCode.startsWith("02")) return "🌤️"; // few clouds
+    if (iconCode.startsWith("03")) return "☁️"; // scattered clouds
+    if (iconCode.startsWith("04")) return "🌥️"; // broken clouds
+    if (iconCode.startsWith("09")) return "🌧️"; // shower rain
+    if (iconCode.startsWith("10")) return "🌦️"; // rain
+    if (iconCode.startsWith("11")) return "⛈️"; // thunderstorm
+    if (iconCode.startsWith("13")) return "❄️"; // snow
+    if (iconCode.startsWith("50")) return "🌫️"; // mist
+
+    return "🌍"; // Generic fallback icon
+  }
+
   updateWeatherDisplay(data) {
-    document.querySelector(
-      ".temperature"
-    ).textContent = `${data.temperature}°C`;
-    document.querySelector(".location").textContent = data.location;
-    document.querySelector(".weather-icon").textContent = data.icon;
+    // Update compact weather in hero section
+    const temperatureEl = document.querySelector(
+      ".weather-compact .temperature"
+    );
+    const locationEl = document.querySelector(".weather-compact .location");
+    const iconEl = document.querySelector(".weather-compact .weather-icon");
+
+    if (temperatureEl && locationEl && iconEl) {
+      temperatureEl.textContent = `${data.temperature}°`;
+      locationEl.textContent = data.location;
+      iconEl.textContent = data.icon;
+    }
+
+    // Update detailed weather in sidebar
+    const tempFullEl = document.querySelector(".weather-temp");
+    const locationFullEl = document.querySelector(".weather-location");
+    const iconLargeEl = document.querySelector(".weather-icon-large");
+    const descriptionEl = document.querySelector(".weather-description");
+
+    if (tempFullEl && locationFullEl && iconLargeEl && descriptionEl) {
+      tempFullEl.textContent = `${data.temperature}°C`;
+      locationFullEl.textContent = data.location;
+      iconLargeEl.textContent = data.icon;
+      descriptionEl.textContent = data.description;
+    }
   }
 
   showNotification(title, message) {
@@ -422,41 +607,6 @@ class MaterialNewTab {
     }
   }
 
-  openSettings() {
-    // This would open a settings modal/panel
-    console.log("Settings panel would open here");
-
-    // Create a simple settings panel
-    const settingsPanel = document.createElement("div");
-    settingsPanel.className = "settings-panel";
-    settingsPanel.innerHTML = `
-            <div class="settings-content">
-                <h2>Settings</h2>
-                <div class="setting-item">
-                    <label>Background Effects</label>
-                    <input type="checkbox" id="bg-effects" checked>
-                </div>
-                <div class="setting-item">
-                    <label>Show Weather</label>
-                    <input type="checkbox" id="show-weather" checked>
-                </div>
-                <div class="setting-item">
-                    <label>24-Hour Clock</label>
-                    <input type="checkbox" id="24h-clock">
-                </div>
-                <button class="close-settings">Close</button>
-            </div>
-        `;
-
-    document.body.appendChild(settingsPanel);
-
-    settingsPanel
-      .querySelector(".close-settings")
-      .addEventListener("click", () => {
-        settingsPanel.remove();
-      });
-  }
-
   loadSettings() {
     // Load user preferences from storage
     const settings = JSON.parse(
@@ -465,11 +615,19 @@ class MaterialNewTab {
 
     // Apply settings
     if (settings.backgroundEffects === false) {
-      document.querySelector(".bg-particles").style.display = "none";
+      const bgScene = document.querySelector(".bg-3d-scene");
+      if (bgScene) {
+        bgScene.style.display = "none";
+      }
     }
 
     if (settings.showWeather === false) {
-      document.querySelector(".weather-widget").style.display = "none";
+      const weatherWidgets = document.querySelectorAll(
+        ".weather-compact, .weather-widget"
+      );
+      weatherWidgets.forEach((widget) => {
+        widget.style.display = "none";
+      });
     }
   }
 }
@@ -479,7 +637,7 @@ document.addEventListener("DOMContentLoaded", () => {
   new MaterialNewTab();
 });
 
-// Add CSS for dynamic elements
+// Additional CSS for dynamic elements that wasn't in the main CSS
 const additionalCSS = `
 .bookmark-item {
     display: flex;
@@ -487,9 +645,9 @@ const additionalCSS = `
     gap: 0.8rem;
     padding: 1rem;
     background: var(--glass-bg);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(15px);
     border: 1px solid var(--glass-border);
-    border-radius: 15px;
+    border-radius: 16px;
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -497,13 +655,13 @@ const additionalCSS = `
 .bookmark-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-    border-color: var(--neon-blue);
+    border-color: var(--primary);
 }
 
 .bookmark-favicon img {
     width: 24px;
     height: 24px;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 .bookmark-info {
@@ -517,101 +675,26 @@ const additionalCSS = `
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-size: 0.9rem;
 }
 
 .bookmark-url {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
+    font-size: 0.8rem;
+    color: var(--text-muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.search-suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: var(--glass-bg);
-    backdrop-filter: blur(15px);
-    border: 1px solid var(--glass-border);
-    border-radius: 15px;
-    margin-top: 0.5rem;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 1000;
-    display: none;
+.timer-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
-.search-suggestion {
-    padding: 0.8rem 1rem;
-    cursor: pointer;
-    transition: background 0.2s ease;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.search-suggestion:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.search-suggestion:last-child {
-    border-bottom: none;
-}
-
-.settings-panel {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(10px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
-}
-
-.settings-content {
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    padding: 2rem;
-    min-width: 300px;
-    max-width: 500px;
-}
-
-.settings-content h2 {
-    margin-bottom: 1.5rem;
-    color: var(--text-primary);
-    text-align: center;
-}
-
-.setting-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
-}
-
-.close-settings {
-    width: 100%;
-    padding: 0.8rem;
-    background: var(--primary-gradient);
-    border: none;
-    border-radius: 10px;
-    color: white;
-    font-weight: 500;
-    cursor: pointer;
-    margin-top: 1rem;
-    transition: all 0.3s ease;
-}
-
-.close-settings:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+.timer-btn:disabled:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--glass-border);
 }
 `;
 
