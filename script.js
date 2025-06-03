@@ -1125,7 +1125,7 @@ class EnhancedMaterialNewTab {
   }
 
   async getWeatherData(defaultCity = "Pune") {
-    const apiKey = "42e074096c5c7a24d95f9929fe994d3b";
+    const apiKey = "YOUR_OPENWEATHERMAP_API_KEY";
     let weatherApiUrl;
 
     if (!apiKey || apiKey === "YOUR_OPENWEATHERMAP_API_KEY") {
